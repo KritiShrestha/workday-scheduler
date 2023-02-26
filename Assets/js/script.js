@@ -14,10 +14,72 @@ $(function () {
   // attribute of each time-block be used to conditionally add or remove the
   // past, present, and future classes? How can Day.js be used to get the
   // current hour in 24-hour time?
-  //
+
+
+  //}
+  //dayjs().hour()
+  //newDate = dayjs.hour(12)
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?
   //
   // TODO: Add code to display the current date in the header of the page.
+  var currentDay = dayjs();
+  $('#currentDay').text(currentDay.format('MMM D, YYYY'));
+
+  var startTime = 9
+  var endTime = 17
+  var currentHour = dayjs().hour()
+  for (var i = 15; i <= 23; i++) {
+    var timeRow = $("<div>").addClass("row time-block").attr('id', "hour-" + i);
+
+    console.log(currentHour);
+    if (i < currentHour) {
+      timeRow.addClass("past");
+    }
+    else if (i === currentHour) {
+      timeRow.addClass("present");
+    }
+    else {
+      timeRow.addClass("future");
+    }
+
+
+    var hour = $("<div>").addClass("col-2 col-md-1 hour text-center py-3");
+    if (i < 12) {
+      hour.text(i + " AM");
+    }
+    else if (i > 12) {
+      hour.text(i - 12 + " PM")
+    }
+    else {
+      hour.text(i + " PM");
+    }
+
+    timeRow.append(hour);
+
+    var textCenter = $("<textarea>").addClass("col-8 col-md-10 description").attr(
+      "rows", "3")
+
+    timeRow.append(textCenter)
+
+    var saveBtn = $("<button>").addClass("btn saveBtn col-2 col-md-1").attr("aria-label", "save")
+    var i_element = $("<i>").addClass("fas fa-save").attr("aria-hidden", "true")
+    saveBtn.append(i_element)
+
+    timeRow.append(saveBtn)
+
+    $(".container-fluid.px-5").append(timeRow);
+
+
+  }
+
+
+
+
+
+
+
+
+
 });
