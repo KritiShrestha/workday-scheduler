@@ -1,39 +1,20 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
+
 $(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-
-
-  //}
-  //dayjs().hour()
-  //newDate = dayjs.hour(12)
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
+  //Setting current day using jquery format
   var currentDay = dayjs();
   $('#currentDay').text(currentDay.format('MMM D, YYYY'));
 
-  var startTime = 9
-  var endTime = 17
-  var currentHour = dayjs().hour()
-  for (var i = 15; i <= 23; i++) {
+  var startTime = 9;
+  var endTime = 17;
+  var currentHour = dayjs().hour(); //get current hour
+  var textFromLocalStorage = JSON.parse(localStorage.getItem("textDescription")) ?? []; //get textDescription from localStorage
+
+  // For loop to create time block for each standard business hours.
+  for (var i = startTime; i <= endTime; i++) {
+    // Create a div for row time block with the id
     var timeRow = $("<div>").addClass("row time-block").attr('id', "hour-" + i);
 
-    console.log(currentHour);
+    // Condititonal statement to check and show past, present and future time by adding classes
     if (i < currentHour) {
       timeRow.addClass("past");
     }
@@ -44,42 +25,76 @@ $(function () {
       timeRow.addClass("future");
     }
 
+    // Creating a div class to display time
+    var timeDisplay = $("<div>").addClass("col-2 col-md-1 hour text-center py-3");
 
-    var hour = $("<div>").addClass("col-2 col-md-1 hour text-center py-3");
+    // if condition to identify which time is AM and PM
     if (i < 12) {
-      hour.text(i + " AM");
+      timeDisplay.text(i + " AM");
     }
     else if (i > 12) {
-      hour.text(i - 12 + " PM")
+      timeDisplay.text(i - 12 + " PM"); // display time in 12 hour format
     }
     else {
-      hour.text(i + " PM");
+      timeDisplay.text(i + " PM");
     }
+    timeRow.append(timeDisplay);
 
-    timeRow.append(hour);
 
-    var textCenter = $("<textarea>").addClass("col-8 col-md-10 description").attr(
-      "rows", "3")
+    //creating a textarea by creating new element and giving it class, id and attribute
+    var textContainer = $("<textarea>").addClass("col-8 col-md-10 description").attr(
+      "rows", "3");
+    var txtId = "text-" + i;
+    textContainer.attr("id", txtId);
 
-    timeRow.append(textCenter)
+    // find if localstorage has text description for the given text id
+    var foundTextContent = textFromLocalStorage.find(e => e.textId === txtId);
+    // if found, display in the textContainer
+    if (foundTextContent != undefined) {
+      textContainer.val(foundTextContent.textValue);
+    }
+    //Append ttextContainer to the time row
+    timeRow.append(textContainer);
 
-    var saveBtn = $("<button>").addClass("btn saveBtn col-2 col-md-1").attr("aria-label", "save")
-    var i_element = $("<i>").addClass("fas fa-save").attr("aria-hidden", "true")
-    saveBtn.append(i_element)
 
-    timeRow.append(saveBtn)
+    //Creating save button, adding class and ID 
+    var saveBtn = $("<button>").addClass("btn saveBtn col-2 col-md-1").attr("aria-label", "save");
+    var i_element = $("<i>").addClass("fas fa-save").attr("aria-hidden", "true");
+    saveBtn.append(i_element);
 
+    //Adding save button to time row
+    timeRow.append(saveBtn);
+
+    //Adding a complete time row to the container
     $(".container-fluid.px-5").append(timeRow);
-
-
   }
 
+  // Function for save button using click event
+  $(".saveBtn").click(function () {
+    // get the id and value of the text container using 'this'
+    var textId = $(this).siblings('.description').attr("id");
+    var textValue = $(this).siblings('.description').val();
 
+    // check if textId already exists in localstorage
+    var foundIndexTextBox = textFromLocalStorage.findIndex(x => x.textId == textId);
 
+    // If found, update to that index with the text value
+    if (foundIndexTextBox != -1) {
+      textFromLocalStorage[foundIndexTextBox].textValue = textValue;
+    }
+    //else add a new entity to local storage
+    else {
+      var newTextbox = { textId, textValue };
+      textFromLocalStorage.push(newTextbox);
+    }
 
+    // Save the updated text description into localstorage
+    localStorage.setItem("textDescription", JSON.stringify(textFromLocalStorage));
 
+    // Show the confirmation to the user
+    $('#saveNotification').text("Appoinment added to localstorage!");
 
-
-
-
+    // fade out the text after 2 secs
+    $('#saveNotification').show().delay(2000).fadeOut();
+  })
 });
