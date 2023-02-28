@@ -20,7 +20,7 @@ A calendar to show the daily planner for working business hours to manage time e
 
 ## Usage
 A webpage calendar to show the daily planner for working hours to manage time effectively
-![Image is the screenshot of homepage of workday-scheduler](./assets/image/workday-scheduler.png)
+![Image is the screenshot of homepage of workday-scheduler](./Assets/image/workday-scheduler.png)
 
 ## Application
 Here's the link to the deployed application - https://kritishrestha.github.io/workday-scheduler.
